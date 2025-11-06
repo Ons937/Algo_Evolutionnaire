@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimization Hub</title>
+    <!-- Pour les icônes (facultatif) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* Début du CSS */
+        /* NOUVEAU THEME ROSE ET VIOLET */
+        :root {
+            --bg-color: #2a0a3b; /* Arrière-plan plus foncé */
+            --panel-bg: #4f1c64; /* Fond des panneaux */
+            --primary-color: #e040fb; /* Violet vif / Magenta */
+            --secondary-color: #f780e2; /* Rose clair */
+            --text-color: #fce4ec; /* Texte clair */
+            --border-color: #8e24aa; /* Bordures */
+            --input-bg: #6a1b9a; /* Fond des inputs */
+            --hover-color: #c51162; /* Couleur au survol */
+            --log-bg: #380a4f; /* Fond du journal */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1400px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        .dashboard {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .panel {
+            background-color: var(--panel-bg);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Ombre plus prononcée */
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .configuration-panel {
+            flex: 0 0 350px;
+        }
+
+        .visualization-panel {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            color: var(--secondary-color);
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        /* Style des radios */
+        .radio-container {
+            display: block;
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .radio-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background-color: var(--input-bg);
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+        }
+
+        .radio-container input:checked ~ .checkmark {
+            background-color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .radio-container input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .radio-container .checkmark:after {
+            top: 6px;
+            left: 6px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+        }
+
+        /* Styles des inputs */
+        input[type="number"] {
+            width: calc(100% - 100px);
+            padding: 8px;
+            margin-bottom: 10px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        label {
+            display: inline-block;
+            width: 120px;
+            margin-bottom: 10px;
+        }
+
+        .parameter-group {
+            margin-bottom: 15px;
+        }
+
+        .small-btn {
+            background-color: var(--border-color);
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .small-btn:hover {
+            background-color: var(--hover-color);
+        }
+
+        /* Graphique */
+        .graph-container {
+            background-color: var(--log-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            height: 400px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        #optimizationCanvas {
+            background-color: var(--log-bg);
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        #taskSchedulingViz {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--secondary-color);
+            font-style: italic;
+            background-color: var(--log-bg);
+        }
+
+        /* Boutons d'action */
+        .info-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: auto;
+            padding-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .primary-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .primary-btn:hover {
+            background-color: #d12df7; /* Teinte plus foncée de violet */
+            transform: translateY(-2px);
+        }
+
+        .secondary-btn {
+            background-color: var(--secondary-color);
+            color: var(--bg-color); /* Texte foncé sur bouton clair */
+        }
+
+        .secondary-btn:hover {
+            background-color: #ed6fe8; /* Teinte plus foncée de rose */
+            transform: translateY(-2px);
+        }
+
+        /* Journal d'événements */
+        .journal-section {
+            margin-top: 20px;
+        }
+
+        .log-area {
+            background-color: var(--log-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 15px;
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        .log-area p {
+            margin: 0;
+            padding-bottom: 5px;
+        }
+
+        /* Utilitaires */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive design */
+        @media (max-width: 1000px) {
+            .dashboard {
+                flex-direction: column;
+            }
+            .configuration-panel {
+                flex: auto;
+                min-width: unset;
+            }
+            .visualization-panel {
+                flex: auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 24px;
+            }
+            .panel {
+                padding: 15px;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            .info-controls {
+                flex-direction: column;
+            }
+            label {
+                width: auto;
+                display: block;
+            }
+            input[type="number"] {
+                width: calc(100% - 15px);
+            }
+            .small-btn {
+                margin-top: 5px;
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+        /* Fin du CSS */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>OPTIMIZATION HUB</h1>
+
+        <div class="dashboard">
+            <div class="panel configuration-panel">
+                <h2>CONFIGURATION</h2>
+
+                <div class="section">
+    <h3>ALGORITHME</h3>
+    <label class="radio-container">Recuit Simulé
+        <input type="radio" name="algorithm" value="simulatedAnnealing" checked>
+        <span class="checkmark"></span>
+    </label>
+    <label class="radio-container">Algorithme Génétique
+        <input type="radio" name="algorithm" value="geneticAlgorithm"> <!-- CORRIGÉ : name="algorithm" -->
+        <span class="checkmark"></span>
+    </label>
+    <label class="radio-container">Recherche Tabou
+        <input type="radio" name="algorithm" value="tabuSearch">
+        <span class="checkmark"></span>
+    </label>
+</div>
+
+                <div class="section">
+                    <h3>TYPE DE PROBLÈME</h3>
+                    <label class="radio-container">Voyageur de Commerce (TSP)
+                        <input type="radio" name="problem" value="tsp" checked>
+                        <span class="checkmark"></span>
+                    </label>
+                    <label class="radio-container">Ordonnancement des Tâches
+                        <input type="radio" name="problem" value="taskScheduling">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+
+                <div class="section">
+                    <h3>PARAMÈTRES</h3>
+                    <div id="parameters-section">
+                        <!-- Les paramètres seront injectés ici par JavaScript -->
+                        <div class="parameter-group" id="params-simulatedAnnealing">
+                            <label for="initialTemp">Température Initiale:</label>
+                            <input type="number" id="initialTemp" value="1000" min="1"><br>
+                            <label for="coolingRate">Taux de Refroidissement:</label>
+                            <input type="number" id="coolingRate" value="0.99" step="0.01" min="0.01" max="0.99"><br>
+                            <label for="iterationsPerTemp">Itérations par Temp:</label>
+                            <input type="number" id="iterationsPerTemp" value="100" min="1">
+                        </div>
+                        <div class="parameter-group hidden" id="params-geneticAlgorithm">
+                            <label for="populationSize">Taille de la Population:</label>
+                            <input type="number" id="populationSize" value="100" min="10"><br>
+                            <label for="numGenerations">Nombre de Générations:</label>
+                            <input type="number" id="numGenerations" value="500" min="10"><br>
+                            <label for="mutationRate">Taux de Mutation:</label>
+                            <input type="number" id="mutationRate" value="0.01" step="0.01" min="0" max="1"><br>
+                            <label for="crossoverRate">Taux de Croisement:</label>
+                            <input type="number" id="crossoverRate" value="0.8" step="0.01" min="0" max="1">
+                        </div>
+                        <div class="parameter-group hidden" id="params-tabuSearch">
+                            <label for="tabuListSize">Taille Liste Tabou:</label>
+                            <input type="number" id="tabuListSize" value="20" min="1"><br>
+                            <label for="tsNumIterations">Nombre d'Itérations:</label>
+                            <input type="number" id="tsNumIterations" value="1000" min="1">
+                        </div>
+
+                        <div class="parameter-group" id="params-tsp">
+                            <label for="numCities">Nombre de Villes:</label>
+                            <input type="number" id="numCities" value="10" min="3">
+                            <button id="generateCitiesBtn" class="small-btn">Générer Villes</button>
+                        </div>
+                        <div class="parameter-group hidden" id="params-taskScheduling">
+                            <label for="numTasks">Nombre de Tâches:</label>
+                            <input type="number" id="numTasks" value="5" min="1"><br>
+                            <label for="numMachines">Nombre de Machines:</label>
+                            <input type="number" id="numMachines" value="3" min="1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel visualization-panel">
+                <h2 id="viz-title">GRAPHES - VOYAGEUR DE COMMERCE</h2>
+                <div class="graph-container">
+                    <canvas id="optimizationCanvas"></canvas>
+                    <div id="taskSchedulingViz" class="hidden">
+                        <!-- La visualisation de l'ordonnancement des tâches irait ici (simulé ou avec une bibliothèque) -->
+                        <p>Visualisation de l'ordonnancement des tâches (diagramme de Gantt simulé).</p>
+                    </div>
+                </div>
+
+                <div class="info-controls">
+                    <button id="startOptimizationBtn" class="btn primary-btn"><i class="fas fa-play"></i> LANCER L'OPTIMISATION</button>
+                    <button id="resetBtn" class="btn secondary-btn"><i class="fas fa-redo"></i> RÉINITIALISER</button>
+                </div>
+
+                <div class="journal-section">
+                    <h3>JOURNAL D'ÉVÉNEMENTS</h3>
+                    <div id="eventLog" class="log-area">
+                        <p>Prêt à commencer l'optimisation...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* Début du JavaScript */
+        document.addEventListener('DOMContentLoaded', () => {
+            const algorithmRadios = document.querySelectorAll('input[name="algorithm"]');
+            const problemRadios = document.querySelectorAll('input[name="problem"]');
+            const parametersSection = document.getElementById('parameters-section');
+            const vizTitle = document.getElementById('viz-title');
+            const optimizationCanvas = document.getElementById('optimizationCanvas');
+            const taskSchedulingViz = document.getElementById('taskSchedulingViz');
+            const eventLog = document.getElementById('eventLog');
+            const startOptimizationBtn = document.getElementById('startOptimizationBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const generateCitiesBtn = document.getElementById('generateCitiesBtn');
+
+            let cities = []; // Pour le TSP
+            let ctx = optimizationCanvas.getContext('2d');
+            const CANVAS_PADDING = 20;
+
+            // Fonction pour ajouter un message au journal
+            function logEvent(message) {
+                const p = document.createElement('p');
+                p.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                eventLog.prepend(p); // Ajoute au début pour voir les plus récents en premier
+                if (eventLog.children.length > 50) { // Limite la taille du journal
+                    eventLog.removeChild(eventLog.lastChild);
+                }
+            }
+
+            // Fonction pour dessiner les villes et le chemin TSP
+            function drawTSP() {
+                ctx.clearRect(0, 0, optimizationCanvas.width, optimizationCanvas.height);
+                if (cities.length === 0) return;
+
+                ctx.strokeStyle = 'var(--secondary-color)'; /* Utilisez la couleur secondaire pour le chemin */
+                ctx.lineWidth = 2;
+
+                // Dessiner le chemin (simulé ici, idéalement la solution de l'algo)
+                if (cities.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(cities[0].x, cities[0].y);
+                    for (let i = 1; i < cities.length; i++) {
+                        ctx.lineTo(cities[i].x, cities[i].y);
+                    }
+                    ctx.lineTo(cities[0].x, cities[0].y); // Retour à la ville de départ
+                    ctx.stroke();
+                }
+
+                // Dessiner les villes
+                cities.forEach((city, index) => {
+                    ctx.fillStyle = 'white'; /* Villes en blanc */
+                    ctx.beginPath();
+                    ctx.arc(city.x, city.y, 5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = 'black'; /* Numéros des villes en noir pour le contraste */
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(index + 1, city.x, city.y - 10);
+                });
+            }
+
+            // Fonction pour générer des villes aléatoires
+            function generateRandomCities() {
+                const numCities = parseInt(document.getElementById('numCities').value);
+                cities = [];
+                for (let i = 0; i < numCities; i++) {
+                    cities.push({
+                        x: Math.random() * (optimizationCanvas.width - 2 * CANVAS_PADDING) + CANVAS_PADDING,
+                        y: Math.random() * (optimizationCanvas.height - 2 * CANVAS_PADDING) + CANVAS_PADDING
+                    });
+                }
+                drawTSP();
+                logEvent(`${numCities} villes générées aléatoirement.`);
+            }
+
+            // Fonction pour ajuster la taille du canvas
+            function resizeCanvas() {
+                optimizationCanvas.width = optimizationCanvas.offsetWidth;
+                optimizationCanvas.height = optimizationCanvas.offsetHeight;
+                if (document.querySelector('input[name="problem"]:checked').value === 'tsp') {
+                    drawTSP(); // Redessine les villes après redimensionnement
+                }
+            }
+
+            window.addEventListener('resize', resizeCanvas);
+
+
+            // Fonction pour afficher/masquer les paramètres et la visualisation
+            function updateInterface() {
+                const selectedAlgorithm = document.querySelector('input[name="algorithm"]:checked').value;
+                const selectedProblem = document.querySelector('input[name="problem"]:checked').value;
+
+                // Gérer les paramètres de l'algorithme
+                document.querySelectorAll('.parameter-group').forEach(group => group.classList.add('hidden'));
+                document.getElementById(`params-${selectedAlgorithm}`).classList.remove('hidden');
+
+                // Gérer les paramètres du problème
+                if (selectedProblem === 'tsp') {
+                    document.getElementById('params-tsp').classList.remove('hidden');
+                    document.getElementById('params-taskScheduling').classList.add('hidden');
+                } else {
+                    document.getElementById('params-taskScheduling').classList.remove('hidden');
+                    document.getElementById('params-tsp').classList.add('hidden');
+                }
+
+                // Gérer la visualisation
+                if (selectedProblem === 'tsp') {
+                    vizTitle.textContent = 'GRAPHES - VOYAGEUR DE COMMERCE';
+                    optimizationCanvas.classList.remove('hidden');
+                    taskSchedulingViz.classList.add('hidden');
+                    drawTSP(); // Assure que le canvas est visible et dessiné
+                } else {
+                    vizTitle.textContent = "VISUALISATION - ORDONNANCEMENT DES TÂCHES";
+                    optimizationCanvas.classList.add('hidden');
+                    taskSchedulingViz.classList.remove('hidden');
+                }
+                logEvent(`Interface mise à jour pour : ${selectedAlgorithm} et ${selectedProblem}.`);
+            }
+
+            // Écouteurs d'événements pour les radios
+            algorithmRadios.forEach(radio => radio.addEventListener('change', updateInterface));
+            problemRadios.forEach(radio => radio.addEventListener('change', updateInterface));
+            generateCitiesBtn.addEventListener('click', generateRandomCities);
+
+            // Initialisation
+            resizeCanvas(); // Ajuste le canvas une première fois
+            updateInterface(); // Configure l'interface au chargement
+
+            // Gérer le bouton Lancer l'Optimisation
+            startOptimizationBtn.addEventListener('click', () => {
+                const selectedAlgorithm = document.querySelector('input[name="algorithm"]:checked').value;
+                const selectedProblem = document.querySelector('input[name="problem"]:checked').value;
+                logEvent(`Lancement de l'optimisation avec ${selectedAlgorithm} pour le problème ${selectedProblem}...`);
+
+                // Ici, tu enverrais les données au serveur via fetch() ou XMLHttpRequest
+                // Exemple (sans implémentation réelle de l'algo):
+                const parameters = {};
+                document.querySelectorAll(`#params-${selectedAlgorithm} input`).forEach(input => {
+                    parameters[input.id] = input.value;
+                });
+                document.querySelectorAll(`#params-${selectedProblem} input`).forEach(input => {
+                    parameters[input.id] = input.value;
+                });
+
+                logEvent(`Paramètres utilisés: ${JSON.stringify(parameters)}`);
+                // Simuler un temps de traitement
+                setTimeout(() => {
+                    logEvent("Optimisation terminée. Meilleure solution trouvée : chemin A-B-C-A.");
+                    // Mettre à jour la visualisation ici avec la solution réelle
+                }, 3000);
+            });
+
+            // Gérer le bouton Réinitialiser
+            resetBtn.addEventListener('click', () => {
+                // Réinitialiser les inputs à leurs valeurs par défaut
+                document.querySelectorAll('input[type="number"]').forEach(input => {
+                    input.value = input.getAttribute('value');
+                });
+                // Réinitialiser les radios (choisir le premier par défaut)
+                document.querySelector('input[name="algorithm"]').checked = true;
+                document.querySelector('input[name="problem"]').checked = true;
+
+                cities = [];
+                drawTSP();
+                eventLog.innerHTML = '<p>Prêt à commencer l\'optimisation...</p>';
+                updateInterface();
+                logEvent("Interface réinitialisée.");
+            });
+        });
+        /* Fin du JavaScript */
+    </script>
+</body>
+</html>
