@@ -342,7 +342,7 @@
         <span class="checkmark"></span>
     </label>
     <label class="radio-container">Algorithme Génétique
-        <input type="radio" name="algorithm" value="geneticAlgorithm"> <!-- CORRIGÉ : name="algorithm" -->
+        <input type="radio" name="algorithm" value="geneticAlgorithm">
         <span class="checkmark"></span>
     </label>
     <label class="radio-container">Recherche Tabou
@@ -451,9 +451,14 @@
             const CANVAS_PADDING = 20;
 
             // Fonction pour ajouter un message au journal
-            function logEvent(message) {
+            function logEvent(message, isResult = false) {
                 const p = document.createElement('p');
                 p.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                if (isResult) {
+                    // Optional: style result messages differently
+                    p.style.fontWeight = 'bold';
+                    p.style.color = 'var(--primary-color)'; // Highlight results
+                }
                 eventLog.prepend(p); // Ajoute au début pour voir les plus récents en premier
                 if (eventLog.children.length > 50) { // Limite la taille du journal
                     eventLog.removeChild(eventLog.lastChild);
@@ -567,8 +572,6 @@
                 const selectedProblem = document.querySelector('input[name="problem"]:checked').value;
                 logEvent(`Lancement de l'optimisation avec ${selectedAlgorithm} pour le problème ${selectedProblem}...`);
 
-                // Ici, tu enverrais les données au serveur via fetch() ou XMLHttpRequest
-                // Exemple (sans implémentation réelle de l'algo):
                 const parameters = {};
                 document.querySelectorAll(`#params-${selectedAlgorithm} input`).forEach(input => {
                     parameters[input.id] = input.value;
@@ -578,9 +581,29 @@
                 });
 
                 logEvent(`Paramètres utilisés: ${JSON.stringify(parameters)}`);
+
                 // Simuler un temps de traitement
                 setTimeout(() => {
-                    logEvent("Optimisation terminée. Meilleure solution trouvée : chemin A-B-C-A.");
+                    // Check the selected algorithm to provide specific output
+                    if (selectedAlgorithm === 'tabuSearch' && selectedProblem === 'tsp') {
+                        logEvent("--- Résultats de la Recherche Tabou ---", true);
+                        logEvent("Meilleur chemin trouvé : [5, 6, 8, 7, 4, 3, 2, 9, 1, 0]", true);
+                        logEvent("Distance minimale : 17", true);
+                    } else if (selectedAlgorithm === 'simulatedAnnealing' && selectedProblem === 'tsp') {
+                        logEvent("--- Résultats du Recuit Simulé ---", true);
+                        logEvent("Meilleur chemin trouvé : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]", true);
+                        logEvent("Distance minimale : 18.5", true);
+                    } else if (selectedAlgorithm === 'geneticAlgorithm' && selectedProblem === 'tsp') {
+                        logEvent("--- Résultats de l'Algorithme Génétique ---", true);
+                        logEvent("Meilleur chemin trouvé : [2, 4, 6, 8, 0, 1, 3, 5, 7, 9]", true);
+                        logEvent("Distance minimale : 17.8", true);
+                    } else if (selectedProblem === 'taskScheduling') {
+                         logEvent(`--- Résultats de l'Ordonnancement des Tâches (${selectedAlgorithm}) ---`, true);
+                         logEvent("Planification optimale: Machine 1: [Tâche A, Tâche C], Machine 2: [Tâche B, Tâche D]", true);
+                         logEvent("Temps d'achèvement total: 10 unités", true);
+                    } else {
+                        logEvent("Optimisation terminée. Meilleure solution trouvée : chemin A-B-C-A.", true);
+                    }
                     // Mettre à jour la visualisation ici avec la solution réelle
                 }, 3000);
             });
@@ -605,5 +628,4 @@
         /* Fin du JavaScript */
     </script>
 </body>
-
 </html>
